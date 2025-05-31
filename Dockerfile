@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:25.10
 
 #############
 # Arguments #
@@ -15,14 +15,16 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     bison build-essential crossbuild-essential-i386 flex gawk git \
     libgmp3-dev libisl-dev libmpc-dev libmpfr-dev mtools mawk texinfo xorriso  \
     python3 pkg-config patch gettext autoconf autopoint automake libtool \
-    glibc-source wget && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /root/src && cd /root/src && \
-    wget --no-check-certificate https://ftp.gnu.org/gnu/binutils/binutils-2.44.tar.gz && \
-    wget --no-check-certificate https://ftp.gnu.org/gnu/gcc/gcc-15.1.0/gcc-15.1.0.tar.gz && \
-    wget --no-check-certificate https://sourceware.org/pub/gdb/snapshots/current/gdb.tar.xz && \
-    wget --no-check-certificate https://ftp.gnu.org/gnu/grub/grub-2.12.tar.gz && \
-    tar -xvf binutils-2.44.tar.gz && \
+    glibc-source wget xz-utils && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download source tarballs & extract them
+WORKDIR /root/src
+ADD https://ftp.gnu.org/gnu/binutils/binutils-2.44.tar.gz .
+ADD https://ftp.gnu.org/gnu/gcc/gcc-15.1.0/gcc-15.1.0.tar.gz .
+ADD https://sourceware.org/pub/gdb/snapshots/current/gdb.tar.xz .
+ADD https://ftp.gnu.org/gnu/grub/grub-2.12.tar.gz .
+RUN tar -xvf binutils-2.44.tar.gz && \
     tar -xvf gcc-15.1.0.tar.gz && \
     tar -xvf gdb.tar.xz && \
     tar -xvf grub-2.12.tar.gz
@@ -71,7 +73,7 @@ RUN mkdir -p /root/src/grub-2.12 && cd /root/src/grub-2.12 && \
     make install && \
     rm /usr/bin/mawk && mv /usr/bin/mawk.bak /usr/bin/mawk
 
-# Cross compiler fix
+# Fix the cross compiler by making symlinks to the files that the compiler wants to use
 RUN mkdir -p /lib/i386-linux-gnu && cd /lib/i386-linux-gnu && \
     ln /usr/i686-linux-gnu/lib/ld-linux.so.2 /lib/ld-linux.so.2 && \
     ln /usr/i686-linux-gnu/lib/libc.so.6 . && \
