@@ -5,8 +5,7 @@ FROM ubuntu:latest
 #
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo libisl-dev grub-common \
-    xorriso grub-pc-bin
+RUN apt install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo libisl-dev grub-common xorriso
 
 ADD https://ftp.gnu.org/gnu/binutils/binutils-2.44.tar.gz /root/src/
 ADD https://ftp.gnu.org/gnu/gcc/gcc-15.1.0/gcc-15.1.0.tar.gz /root/src/
