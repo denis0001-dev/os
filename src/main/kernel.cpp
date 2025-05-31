@@ -1,11 +1,3 @@
-/** @file
- * denOS kernel
- * Created by denis0001-dev on https://gitverse.ru/denis0001-dev/denOS/content/master/src/main/kernel.cpp
- * Version 0.7.12
- * Compiling, linking, and building commands from https://wiki.osdev.org/Bare_Bones
- * DO NOT EDIT OR REMOVE THIS HEADER.
- */
-
 // ReSharper disable CppUnusedIncludeDirective
 #include <limits.h>
 #include <stdbool.h>

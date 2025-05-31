@@ -1,11 +1,3 @@
-/**
- * denOS linker script
- * Created by denis0001-dev on https://gitverse.ru/denis0001-dev/denOS/content/master/src/main/linker.ld
- * Version 1.0
- * Compiling, linking, and building commands from https://wiki.osdev.org/Bare_Bones
- * DO NOT EDIT OR REMOVE THIS HEADER.
- */
-
 /* The bootloader will look at this image and start execution at the symbol
    designated as the entry point. */
 ENTRY(_start)

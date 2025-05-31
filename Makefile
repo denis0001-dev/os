@@ -1,11 +1,3 @@
-#
-# denOS makefile
-# Created by denis0001-dev on https://gitverse.ru/denis0001-dev/denOS/content/master/Makefile
-# Version 1.0
-# Compiling, linking, and building commands from https://wiki.osdev.org/Bare_Bones
-# DO NOT EDIT OR REMOVE THIS HEADER.
-#
-
 # OS target architecture
 TARGET = i686-elf
 # Cross-compiler root directory
@@ -36,6 +28,7 @@ INDIR = $(shell realpath .)/src/main
 # will be deleted. After that, the folder will contain the kernel
 # binary "denOS.bin" and the ISO "denOS.iso".
 OUTDIR = $(shell realpath .)/build
+PROJDIR = $(shell realpath .)
 
 # Declare some environment variables
 setup:
@@ -43,6 +36,7 @@ setup:
 	export TARGET=$(TARGET)
 	export PREFIX=$(PREFIX)
 	export PATH="$(PREFIX)/bin:$PATH"
+	mkdir -p $(OUTDIR)
 
 # Clean all files.
 clean: clean_all
@@ -59,11 +53,13 @@ clean_tmp_files:
 # Clear the build directory, declare variables, compile boot, kernel,
 # link the object files produced by the compilers, check that the kernel
 # is valid, make the ISO, clean the temporary files.
-all: clean setup boot kernel link check iso clean_tmp_files
+all: clean setup boot kernel link check iso
 
 # Build the OS, launch it in QEMU with debugging support.
-qemu: all
+qemu-nocompile:
 	qemu-system-i386 -cdrom $(OUTDIR)/denOS.iso -s -m 1G
+
+qemu: all qemu-nocompile
 
 # Compile the bootstrap assembly, needed to properly initialize
 # the processor, and launch the high-level kernel in C++.
@@ -95,5 +91,6 @@ link:
 iso:
 	mkdir -p $(OUTDIR)/iso/boot/grub
 	cp $(OUTDIR)/denOS.bin $(OUTDIR)/iso/boot/denOS.bin
-	echo "menuentry \"denOS 0.7\" {\n\tmultiboot /boot/denOS.bin\n}" > $(OUTDIR)/iso/boot/grub/grub.cfg
+	cp $(PROJDIR)/grub.cfg $(OUTDIR)/iso/boot/grub/grub.cfg
+	cd $(OUTDIR)/iso
 	grub-mkrescue -o $(OUTDIR)/denOS.iso $(OUTDIR)/iso

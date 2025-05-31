@@ -1,11 +1,3 @@
-;
-; denOS kernel bootstrap
-; Created by denis0001-dev on https://gitverse.ru/denis0001-dev/denOS/content/master/src/main/boot.s
-; Version 1.0
-; Compiling, linking, and building commands from https://wiki.osdev.org/Bare_Bones
-; DO NOT EDIT OR REMOVE THIS HEADER.
-;
-
 ; Declare constants for the multiboot header.
 .set ALIGN,    1<<0             ; align loaded modules on page boundaries
 .set MEMINFO,  1<<1             ; provide memory map
