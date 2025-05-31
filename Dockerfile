@@ -1,53 +1,57 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
-#
 # Install dependencies
-#
-RUN apt update
-RUN apt upgrade -y
-RUN apt install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo libisl-dev grub-common xorriso
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    bison \
+    build-essential \
+    flex \
+    grub-common \
+    libgmp3-dev \
+    libisl-dev \
+    libmpc-dev \
+    libmpfr-dev \
+    texinfo \
+    xorriso && \
+    rm -rf /var/lib/apt/lists/*
 
+# Add source files
 ADD https://ftp.gnu.org/gnu/binutils/binutils-2.44.tar.gz /root/src/
 ADD https://ftp.gnu.org/gnu/gcc/gcc-15.1.0/gcc-15.1.0.tar.gz /root/src/
 ADD https://sourceware.org/pub/gdb/snapshots/current/gdb.tar.xz /root/src/
 
 WORKDIR /root/src
-RUN ls *.gz | xargs -n1 tar -xvf
-RUN ls *.xz | xargs -n1 tar -xvf
+RUN tar -xvf binutils-2.44.tar.gz && tar -xvf gcc-15.1.0.tar.gz && tar -xvf gdb.tar.xz
 
-#
 # Environment
-#
 ARG PREFIX="/opt/cross"
 ARG TARGET=i686-elf
 ENV PATH="$PREFIX/bin:$PATH"
 
 # Binutils
 WORKDIR /root/src/build-binutils
-RUN ../binutils-*/configure --target=${TARGET} --prefix="${PREFIX}" --with-sysroot --disable-nls --disable-werror
-RUN make -j 10
-RUN make install
+RUN ../binutils-2.44/configure --target=${TARGET} --prefix="${PREFIX}" --with-sysroot --disable-nls --disable-werror && \
+    make -j$(nproc) && \
+    make install
 
 # GDB
 WORKDIR /root/src/build-gdb
-RUN ../gdb-*/configure --target=${TARGET} --prefix="${PREFIX}" --disable-werror
-RUN make -j 10 all-gdb
-RUN make -j 10 install-gdb
+RUN ../gdb/configure --target=${TARGET} --prefix="${PREFIX}" --disable-werror && \
+    make -j$(nproc) all-gdb && \
+    make install-gdb
 
 # GCC
-RUN which -- ${TARGET}-as || echo ${TARGET}-as is not in the PATH
-
 WORKDIR /root/src/build-gcc
-RUN ../gcc-*/configure --target=$TARGET --prefix="$PREFIX" --disable-nls --enable-languages=c,c++ \
-    --without-headers --disable-hosted-libstdcxx
-RUN make -j 10 all-gcc
-RUN make -j 10 all-target-libgcc
-RUN make -j 10 all-target-libstdc++-v3
-RUN make install-gcc
-RUN make install-target-libgcc
-RUN make install-target-libstdc++-v3
+RUN ../gcc-15.1.0/configure --target=$TARGET --prefix="$PREFIX" --disable-nls --enable-languages=c,c++ \
+    --without-headers --disable-hosted-libstdcxx && \
+    make -j$(nproc) all-gcc && \
+    make -j$(nproc) all-target-libgcc && \
+    make -j$(nproc) all-target-libstdc++-v3 && \
+    make install-gcc && \
+    make install-target-libgcc && \
+    make install-target-libstdc++-v3
 
 # Clean up
-RUN rm -r /root/src/
+WORKDIR /
+RUN rm -rf /root/src/
 
 CMD ["sh", "-c", "cd /root/os/ && make all"]
