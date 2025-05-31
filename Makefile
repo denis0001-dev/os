@@ -53,7 +53,7 @@ clean_tmp_files:
 # Clear the build directory, declare variables, compile boot, kernel,
 # link the object files produced by the compilers, check that the kernel
 # is valid, make the ISO, clean the temporary files.
-all: clean setup boot kernel link check iso
+all: shell clean setup boot kernel link check iso
 
 # Build the OS, launch it in QEMU with debugging support.
 qemu-nocompile:
@@ -94,3 +94,5 @@ iso:
 	cp $(PROJDIR)/grub.cfg $(OUTDIR)/iso/boot/grub/grub.cfg
 	cd $(OUTDIR)/iso
 	grub-mkrescue -o $(OUTDIR)/denOS.iso $(OUTDIR)/iso
+
+shell:
