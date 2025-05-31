@@ -87,6 +87,11 @@ RUN mkdir -p /lib/i386-linux-gnu && cd /lib/i386-linux-gnu && \
 ############
 RUN rm -rf /root/src/
 
+############
+# Metadata #
+############
+LABEL org.opencontainers.image.source=https://github.com/denis0001-dev/os
+LABEL org.opencontainers.image.description="The build environment for this OS"
 
 ######################
 # Command to execute #
